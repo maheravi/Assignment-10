@@ -1,0 +1,39 @@
+import telebot
+import random
+
+bot = telebot.TeleBot("X")
+
+buttons = telebot.types.ReplyKeyboardMarkup(row_width=1)
+btn1 = telebot.types.KeyboardButton('بازی جدید')
+buttons.add(btn1)
+
+
+@bot.message_handler(commands=['start'])
+def say_welcome(message):
+    bot.send_message(message.chat.id, "سلام خوش اومدی به این ربات")
+    bot.send_message(message.chat.id, "این ربات بازی حدس عدد است برای شروع روی بازی جدید بزن", reply_markup=buttons)
+
+
+def rand():
+    my_guess = random.randint(0, 30)
+    return my_guess
+
+
+@bot.message_handler(func=lambda message: True)
+def normal_message(message):
+    global my_guess
+    if message.text == 'بازی جدید':
+        bot.send_message(message.chat.id, "ببینم میتونی عددی که من توی ذهنم بین 0 و 30 در نظر گرفتم و حدس بزنی یا نه :")
+        my_guess = rand()
+    if message.text.isnumeric():
+        user_guess = int(message.text)
+        if user_guess == my_guess:
+            bot.reply_to(message, "نِه باریکلا درست گفتی ✌")
+            bot.reply_to(message, "برای بازی دوباره روی بازی جدید بزن")
+        elif user_guess < my_guess:
+            bot.reply_to(message, "برو بالاتر")
+        elif user_guess > my_guess:
+            bot.reply_to(message, "بیا پایین تر")
+
+
+bot.polling()
